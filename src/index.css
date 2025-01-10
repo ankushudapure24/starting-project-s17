@@ -89,6 +89,7 @@ fieldset {
   color: #142020;
 }
 
+
 .control:has(input[type='checkbox']) {
   display: flex;
   align-items: center;
