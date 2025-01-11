@@ -1,44 +1,51 @@
-import { useState } from "react";
+import Input from "./Input";
+import {isEmail, isNotEmpty, hasMinLength} from '../util/validation.js';
+import { useInput } from '../hooks/useInput.js';
 
 export default function Login() {
   // const [enteredEmail, setEnteredEmail] = useState();
   // const [enteredPassword, setEnteredPassword] = useState();
-
-  const [enteredValues, setEnteredValues] = useState({
-    email: "",
-    password: "",
-  });
-
-  const [didEdit, setDidEdit] = useState({
-    email: false,
-    password: false
-  });
-
-  const emailIsInvalid = didEdit.email && !enteredValues.email.includes("@");
+  const {
+    value: emailValue,
+    handleInputChange: handleEmailChange,
+    handleInputBlur: handleEmailBlur,
+    hasError: emailHasError
+  } = useInput('', (value) =>  isEmail(value) && isNotEmpty(value));
+  
+  const {
+    value: passwordValue,
+    handleInputChange: handlePasswordChange,
+    handleInputBlur: handlePasswordBlur,
+    hasError: passwordHasError
+  } = useInput('', (value) => hasMinLength(value), 6);
 
   function handleSubmit(event) {
     event.preventDefault();
 
-    console.log(enteredValues);
+    if(emailHasError || passwordHasError){
+      return;
+    }
+
+    console.log(emailValue,  passwordValue);
   }
 
-  function handleInputChange(identifier, value) {
-    setEnteredValues((prevValues) => ({
-      ...prevValues,
-      [identifier]: value,
-    }));
-    setDidEdit((prevEdit) => ({
-      ...prevEdit,
-      [identifier]: false,
-    }));
-  }
+  // function handleInputChange(identifier, value) {
+  //   setEnteredValues((prevValues) => ({
+  //     ...prevValues,
+  //     [identifier]: value,
+  //   }));
+  //   setDidEdit((prevEdit) => ({
+  //     ...prevEdit,
+  //     [identifier]: false,
+  //   }));
+  // }
 
-  function handleInputBlur(identifier) {
-    setDidEdit((prevEdit) => ({
-      ...prevEdit,
-      [identifier]: true
-    }));
-  }
+  // function handleInputBlur(identifier) {
+  //   setDidEdit((prevEdit) => ({
+  //     ...prevEdit,
+  //     [identifier]: true,
+  //   }));
+  // }
 
   // function handleEmailChange(event) {
   //   setEnteredEmail(event.target.value);
@@ -53,36 +60,29 @@ export default function Login() {
       <h2>Login</h2>
 
       <div className="control-row">
-        <div className="control no-margin">
-          <label htmlFor="email">Email</label>
-          <input
-            id="email"
-            type="email"
-            name="email"
-            placeholder="xyz@gmsil.com"
-            onBlur={() => handleInputBlur('email')}
-            value={enteredValues.email}
-            onChange={(event) => handleInputChange("email", event.target.value)}
-          />
-          <div className="control-error">
-            {emailIsInvalid && <p>Please enter valid email address.</p>}
-          </div>
-        </div>
+        <Input
+          label="Email"
+          id="email"
+          type="email"
+          name="email"
+          placeholder="xyz@gmsil.com"
+          onBlur={handleEmailBlur}
+          value={emailValue}
+          onChange={handleEmailChange}
+          error={emailHasError && 'Please enter valid email.'}
+        />
 
-        <div className="control no-margin">
-          <label htmlFor="password">Password</label>
-          <input
-            id="password"
-            type="password"
-            name="password"
-            value={setEnteredValues.password}
-            onChange={(event) =>
-              handleInputChange("password", event.target.value)
-            }
-          />
-        </div>
+        <Input
+          label="Password"
+          id="password"
+          type="password"
+          name="password"
+          onChange={handlePasswordChange}
+          value={passwordValue}
+          onBlur={handlePasswordBlur}
+          error={passwordHasError && 'Please enter valid password.'}
+        />
       </div>
-
       <p className="form-actions">
         <button className="button button-flat">Reset</button>
         <button className="button">Login</button>
